@@ -21,6 +21,7 @@ client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
     if (message.mentions.has(client.user)) {
+        await message.channel.sendTyping();
         const response = await ollama.chat({
             model: "gpt-oss:120b-cloud",
             messages: [
