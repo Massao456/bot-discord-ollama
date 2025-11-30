@@ -1,11 +1,12 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits } from 'discord.js';
 import 'dotenv/config';
-import { Ollama } from "ollama";
+import { Ollama } from 'ollama';
+import fs from 'fs';
 
 const ollama = new Ollama({
-    host: "https://ollama.com",
+    host: 'https://ollama.com',
     headers: {
-        Authorization: "Bearer " + process.env.OLLAMA_API_KEY,
+        Authorization: 'Bearer ' + process.env.OLLAMA_API_KEY,
     },
 });
 
@@ -13,22 +14,31 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
-    ]
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
-client.on("messageCreate", async (message) => {
+client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
-    if (message.mentions.has(client.user)) {
-        await message.channel.sendTyping();
-        const response = await ollama.chat({
-            model: "gpt-oss:120b-cloud",
-            messages: [
-                { role: "user", content: message.content },
-                { role: "system", content: "Voce sempre respondera em português de forma simples, rapida, com poucas palavras e com uma resposta com menos de 1500 caracteres" },],
-        });
-        message.reply(response.message.content);
+    try {
+        if (message.mentions.has(client.user)) {
+            await message.channel.sendTyping();
+
+            const prompt = await fs.promises.readFile('./prompt.txt', 'utf8');
+
+            const response = await ollama.chat({
+                model: 'gpt-oss:120b-cloud',
+                messages: [
+                    { role: 'system', content: prompt },
+                    { role: 'user', content: message.content },
+                ],
+            });
+            message.reply(response.message.content);
+        }
+    } catch (err) {
+        console.error('Erro no messageCreate:', err);
+        message.reply('Ocorreu um erro ao processar sua mensagem.');
     }
 });
 

@@ -22,6 +22,8 @@ npm install
 
 2. Crie um arquivo `.env` na raiz com as variáveis necessárias (ex.: `DISCORD_TOKEN`, `OLLAMA_API_KEY`).
 
+3. Crie um arquivo `prompt.txt` na raiz com o prompt do que a IA ira seguir (ex.: `Você é um agente de telemarketing`)
+
 **Execução**
 Execute o bot com:
 
